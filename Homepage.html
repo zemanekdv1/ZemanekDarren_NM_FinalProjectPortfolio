@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darren Zemanek - Portfolio</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+        }
+
+        header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background: #444;
+            padding: 10px 0;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .menu > li {
+            position: relative;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: inline-block;
+            font-size: 18px;
+        }
+
+        .menu a:hover {
+            background: #555;
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            background: #444;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 150px;
+            display: none;
+            border: 1px solid #555;
+            z-index: 2000;
+        }
+
+        .dropdown-menu li a {
+            display: block;
+            padding: 10px;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu li a:hover {
+            background: #555;
+        }
+
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .home-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .home-bar {
+            max-width: 900px;
+            margin: 40px auto;
+            background: rgb(79, 79, 79);
+            padding: 40px;
+            border-radius: 10px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        body {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        body.fade-out {
+            opacity: 0;
+            transform: translateX(-40px);
+        }
+
+        body.fade-in {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+        body.fade-in-loaded {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Welcome to My Portfolio</h1>
+    </header>
+    <nav>
+        <ul class="menu">
+            <li><a href="Homepage.html">Home</a></li>
+
+            <li class="dropdown">
+                <a href="#">Projects ▾</a>
+                <ul class="dropdown-menu">
+                    <li><a href="Dungeon.html">Dungeon Bosses</a></li>
+                    <li><a href="SI_Gallery.html">Steampunk Insect</a></li>
+                    <li><a href="PT_Gallery.html">PT - Group Project</a></li>
+                    <li><a href="PT2_Gallery.html">PT - Personal Scene</a></li>
+                    <li><a href="CT_Gallery.html">Cryptid Taxi</a></li>
+                    <li><a href="S_Gallery.html">Spark</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html">Model Viewer</a></li>
+            <li><a href="about.html">About/Contact</a></li>
+        </ul>
+    </nav>
+    <div class="home-bar">
+        <h2 style="text-align:right ; color: #f4f4f4;">Hello, I'm Darren Zemanek, and This is my Portfolio!</h2>
+    </div>
+    <div class="home-container">
+        <div class="content">
+            <p>
+                <p>I am utilizing this website as an easy way to gather and present my creative works.</p>
+                <p>The works I've gathered range from conceptual game design, to rendered videos of environmental design, to video games that I've created.
+                I have divided them up in specific categories to see the work that I did during projects/classes I attended.</p>
+                <p>To start viewing my work, go to the drop-down menu labeled "Projects". There's also a model viewer you can use
+                to view specific models in a lit 3D space, found in the "Model Viewer" tab.</p>
+                <p>If you want to learn more about me or contact me yourself, you can read more in the "About/Contact"
+                tab, where I've also provided some prefered forms of contact.</p>
+                
+                <p>Thank you for taking the time to view my portfolio website.
+                It means a lot to me that you would explore through my work,
+                as it allows me to not only display my many peices, but to
+                also share a part of my time and self with others.</p>
+
+                <p>Thank you, and I hope you enjoy!</p>
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        © 2025 Darren Zemanek
+    </footer>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+
+        setTimeout(() => {
+            document.body.classList.add("fade-in-loaded");
+            document.body.classList.remove("fade-in");
+        }, 20);
+
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute("href");
+
+            if (!href || href.startsWith('#') || href.startsWith("javascript:")) return;
+
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                document.body.classList.add("fade-out");
+
+                setTimeout(() => {
+                    window.location = href;
+                }, 500);
+            });
+        });
+    });
+    </script>
+
+</body>
+</html>

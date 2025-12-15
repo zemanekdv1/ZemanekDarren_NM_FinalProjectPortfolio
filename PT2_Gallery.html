@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Techniques - Scene Project</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            transition: opacity 0.4s ease;
+        }
+
+        body.fade-out { opacity: 0; }
+
+        header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background: #444;
+            padding: 10px 0;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .menu > li { position: relative; }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: inline-block;
+            font-size: 18px;
+        }
+        .menu a:hover { background: #555; }
+
+        .dropdown-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            background: #444;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 150px;
+            display: none;
+            border: 1px solid #555;
+            z-index: 2000;
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+
+        .dropdown-menu li a { display: block; padding: 10px; }
+        .dropdown-menu li a:hover { background: #555; }
+        
+        .gallery-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+
+        .gallery-item img, .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-intro {
+            max-width: 1100px;
+            margin: 40px auto 20px auto;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .gallery-intro h2 {
+            margin-bottom: 15px;
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .gallery-intro p {
+            font-size: 18px;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .gallery-intro-flex {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 40px auto 20px auto;
+            gap: 20px;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .intro-text {
+            flex: 1 1 50%;
+            color: #ccc;
+        }
+
+        .intro-text h2 {
+            margin-bottom: 15px;
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .intro-text p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .intro-media {
+            flex: 1 1 40%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .intro-media img, .intro-media video {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            z-index: 1000;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .modal-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 50px;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+            padding: 10px;
+            transition: 0.2s;
+            z-index: 2001;
+        }
+
+        .modal-arrow.left { left: 30px; }
+        .modal-arrow.right { right: 30px; }
+
+        .modal-arrow:hover {
+            color: #ddd;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            animation: scaleIn 0.4s ease;
+        }
+
+        .modal-content img, .modal-content video {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .modal-description {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .close-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .close-btn:hover { background: #555; }
+
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+        @keyframes scaleIn { from {transform: scale(0.9);} to {transform: scale(1);} }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+        }
+
+        body {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        body.fade-out {
+            opacity: 0;
+            transform: translateX(-40px);
+        }
+
+        body.fade-in {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+        body.fade-in-loaded {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Production Techniques</h1>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <ul class="menu">
+            <li><a href="Homepage.html">Home</a></li>
+
+            <li class="dropdown">
+                <a href="#">Projects ▾</a>
+                <ul class="dropdown-menu">
+                    <li><a href="Dungeon.html">Dungeon Bosses</a></li>
+                    <li><a href="SI_Gallery.html">Steampunk Insect</a></li>
+                    <li><a href="PT_Gallery.html">PT - Group Project</a></li>
+                    <li><a href="PT2_Gallery.html">PT - Personal Scene</a></li>
+                    <li><a href="CT_Gallery.html">Cryptid Taxi</a></li>
+                    <li><a href="S_Gallery.html">Spark</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html">Model Viewer</a></li>
+            <li><a href="about.html">About/Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Intro -->
+    <section class="gallery-intro-flex">
+        <div class="intro-text">
+            <h2>Production Techniques - Personal Scene</h2>
+            <p>Production Techniques was a summer class I took to learn and understand the basics of 3D modeling, texture creation, and environmental design. The project I am showing consists of an environmental scene worked on by one person, me, with the allotment of less than half of the used assets in the scene being store-bought or made by someone else. To put it simply, the goal was to create an interesting scene while creating most of the models and textures yourself. I utilized Maya and Adobe Substance Painter for the modeling and texture creation during this project, and Unreal Engine for the scene environment space and rendering software..</p>
+            <p style="text-align:center;"><video src="my-Gallery\videos\PT2_Videos\ZemanekDarren_PersonalScene.mp4" controls height="480" width="640"></video></p>
+        </div>
+    </section>
+
+    <!-- Gallery -->
+    <div class="gallery-container">
+        <div class="gallery-grid">
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\GoldPan (1).png" data-desc="Pan - Realistic (Textured).">
+                <img src="my-Gallery\images\PT2_Images\GoldPan (1).png" alt="Pan1">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\GoldPan (2).png" data-desc="Pan - Realistic (Untextured) Top.">
+                <img src="my-Gallery\images\PT2_Images\GoldPan (2).png" alt="Pan2">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\GoldPan (3).png" data-desc="Pan - Realistic (Untextured) Bottom.">
+                <img src="my-Gallery\images\PT2_Images\GoldPan (3).png" alt="Pan3">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\GoldPan (4).png" data-desc="Pan - Realistic (Wireframe) Top.">
+                <img src="my-Gallery\images\PT2_Images\GoldPan (4).png" alt="Pan4">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\GoldPan (5).png" data-desc="Pan - Realistic (Wireframe) Bottom.">
+                <img src="my-Gallery\images\PT2_Images\GoldPan (5).png" alt="Pan5">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\GoldPan (6).png" data-desc="Pan - Realistic (UV) Top.">
+                <img src="my-Gallery\images\PT2_Images\GoldPan (6).png" alt="Pan6">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\GoldPan (7).png" data-desc="Pan - Realistic (UV) Bottom.">
+                <img src="my-Gallery\images\PT2_Images\GoldPan (7).png" alt="Pan7">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (1).png" data-desc="Tub - Realistic (Textured).">
+                <img src="my-Gallery\images\PT2_Images\Tub (1).png" alt="Tub1">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (2).png" data-desc="Tub - Realistic (Untextured) Side.">
+                <img src="my-Gallery\images\PT2_Images\Tub (2).png" alt="Tub2">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (3).png" data-desc="Tub - Realistic (Untextured) Top.">
+                <img src="my-Gallery\images\PT2_Images\Tub (3).png" alt="Tub3">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (4).png" data-desc="Tub - Realistic (Untextured) Bottom.">
+                <img src="my-Gallery\images\PT2_Images\Tub (4).png" alt="Tub4">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (5).png" data-desc="Tub - Realistic (Wireframe) Top.">
+                <img src="my-Gallery\images\PT2_Images\Tub (5).png" alt="Tub5">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (6).png" data-desc="Tub - Realistic (Wireframe) Bottom.">
+                <img src="my-Gallery\images\PT2_Images\Tub (6).png" alt="Tub6">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (7).png" data-desc="Tub - Realistic (UV) Top.">
+                <img src="my-Gallery\images\PT2_Images\Tub (7).png" alt="Tub7">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Tub (8).png" data-desc="Tub - Realistic (UV) Bottom.">
+                <img src="my-Gallery\images\PT2_Images\Tub (8).png" alt="Tub8">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (1).png" data-desc="Lamp - Realistic (Textured).">
+                <img src="my-Gallery\images\PT2_Images\Lamp (1).png" alt="Lamp1">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (2).png" data-desc="Lamp - Realistic (Untextured) Front.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (2).png" alt="Lamp2">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (3).png" data-desc="Lamp - Realistic (Untextured) Back.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (3).png" alt="Lamp3">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (4).png" data-desc="Lamp - Realistic (Untextured) Top.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (4).png" alt="Lamp4">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (5).png" data-desc="Lamp - Realistic (Wireframe) Front.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (5).png" alt="Lamp5">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (6).png" data-desc="Lamp - Realistic (Wireframe) Back.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (6).png" alt="Lamp6">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (7).png" data-desc="Lamp - Realistic (Wireframe) Top.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (7).png" alt="Lamp7">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (8).png" data-desc="Lamp - Realistic (UV) Front.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (8).png" alt="Lamp8">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Lamp (9).png" data-desc="Lamp - Realistic (UV) Back.">
+                <img src="my-Gallery\images\PT2_Images\Lamp (9).png" alt="Lamp9">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (1).png" data-desc="Rocker Box - Realistic (Textured).">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (1).png" alt="RBox1">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (2).png" data-desc="Rocker Box - Rigged.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (2).png" alt="RBox2">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (3).png" data-desc="Rocker Box - Realistic (Wireframe) Side.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (3).png" alt="RBox3">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (4).png" data-desc="Rocker Box - Realistic (Untextured) Side.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (4).png" alt="RBox4">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (5).png" data-desc="Rocker Box - Realistic (Untextured) Front.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (5).png" alt="RBox5">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (6).png" data-desc="Rocker Box - Realistic (Wireframe) Front.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (6).png" alt="RBox6">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (7).png" data-desc="Rocker Box - Realistic (Untextured) Top.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (7).png" alt="RBox7">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (8).png" data-desc="Rocker Box - Realistic (Wireframe) Top.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (8).png" alt="RBox8">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (9).png" data-desc="Rocker Box - Realistic (UV) Side 1.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (9).png" alt="RBox9">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\RockerBox (10).png" data-desc="Rocker Box - Realistic (UV) Side 2.">
+                <img src="my-Gallery\images\PT2_Images\RockerBox (10).png" alt="RBox10">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Concept_1.png" data-desc="Concept - Whiteboxing in Unreal.">
+                <img src="my-Gallery\images\PT2_Images\Concept_1.png" alt="Concept1">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Concept_2.png" data-desc="Concept - First Pass.">
+                <img src="my-Gallery\images\PT2_Images\Concept_2.png" alt="Concept2">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Concept_3.png" data-desc="Concept - Final Render.">
+                <img src="my-Gallery\images\PT2_Images\Concept_3.png" alt="Concept3">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\PT2_Images\Concept_4.png" data-desc="Concept - Model Breakdown.">
+                <img src="my-Gallery\images\PT2_Images\Concept_4.png" alt="Concept4">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-arrow left" id="arrow-left">❮</div>
+
+        <div class="modal-content" id="modal-content">
+            <span id="modal-media"></span>
+            <p class="modal-description" id="modal-description"></p>
+            <button class="close-btn" id="close-btn">Close</button>
+        </div>
+
+        <div class="modal-arrow right" id="arrow-right">❯</div>
+    </div>
+
+    <footer>
+        © 2025 Darren Zemanek
+    </footer>
+
+    <script>
+    const items = document.querySelectorAll(".gallery-item");
+    const modal = document.getElementById("modal");
+    const modalMedia = document.getElementById("modal-media");
+    const modalDesc = document.getElementById("modal-description");
+    const closeBtn = document.getElementById("close-btn");
+    const arrowLeft = document.getElementById("arrow-left");
+    const arrowRight = document.getElementById("arrow-right");
+
+    let currentIndex = 0;
+
+    function openModal(index) {
+        const item = items[index];
+        const src = item.dataset.src;
+        const desc = item.dataset.desc;
+        const type = item.dataset.type;
+
+        modalMedia.innerHTML =
+            type === "video"
+            ? `<video src="${src}" controls autoplay></video>`
+            : `<img src="${src}" alt="">`;
+
+        modalDesc.textContent = desc;
+
+        modal.style.display = "flex";
+    }
+
+    items.forEach((item, i) => {
+        item.addEventListener("click", () => {
+            currentIndex = i;
+
+            document.body.classList.add("fade-out");
+            setTimeout(() => {
+                openModal(currentIndex);
+                document.body.classList.remove("fade-out");
+            }, 400);
+        });
+    });
+
+    closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    modal.addEventListener("click", e => {
+        if (e.target === modal) modal.style.display = "none";
+    });
+
+    arrowLeft.addEventListener("click", e => {
+        e.stopPropagation();
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        openModal(currentIndex);
+    });
+
+    arrowRight.addEventListener("click", e => {
+        e.stopPropagation();
+        currentIndex = (currentIndex + 1) % items.length;
+        openModal(currentIndex);
+    });
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+
+        setTimeout(() => {
+            document.body.classList.add("fade-in-loaded");
+            document.body.classList.remove("fade-in");
+        }, 20);
+
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute("href");
+
+            if (!href || href.startsWith('#') || href.startsWith("javascript:")) return;
+
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                document.body.classList.add("fade-out");
+
+                setTimeout(() => {
+                    window.location = href;
+                }, 500);
+            });
+        });
+    });
+    </script>
+</body>
+</html>

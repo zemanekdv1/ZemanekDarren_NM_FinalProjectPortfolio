@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darren Zemanek - Portfolio</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        body.fade-out {
+            opacity: 0;
+            transform: translateX(-40px);
+        }
+
+        body.fade-in {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+
+        body.fade-in-loaded {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background: #444;
+            padding: 10px 0;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .menu > li {
+            position: relative;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: inline-block;
+            font-size: 18px;
+        }
+
+        .menu a:hover {
+            background: #555;
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            background: #444;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 150px;
+            display: none;
+            border: 1px solid #555;
+            z-index: 2000;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu li a:hover {
+            background: #555;
+        }
+
+        /* ABOUT PAGE STYLING */
+        .about-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .about-photo {
+            width: 260px;
+            height: auto;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .about-text {
+            text-align: left;
+        }
+
+        .about-text h2 {
+            margin-top: 0;
+        }
+
+        .about-text ul {
+            padding-left: 20px;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>About Me - Darren Zemanek</h1>
+    </header>
+
+    <nav>
+        <ul class="menu">
+            <li><a href="Homepage.html">Home</a></li>
+
+            <li class="dropdown">
+                <a href="#">Projects ▾</a>
+                <ul class="dropdown-menu">
+                    <li><a href="Dungeon.html">Dungeon Bosses</a></li>
+                    <li><a href="SI_Gallery.html">Steampunk Insect</a></li>
+                    <li><a href="PT_Gallery.html">PT - Group Project</a></li>
+                    <li><a href="PT2_Gallery.html">PT - Personal Scene</a></li>
+                    <li><a href="CT_Gallery.html">Cryptid Taxi</a></li>
+                    <li><a href="S_Gallery.html">Spark</a></li>
+                </ul>
+            </li>
+
+            <li><a href="index.html">Model Viewer</a></li>
+            <li><a href="about.html">About/Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Intro -->
+    <div class="about-container">
+        <!-- <img src="your-photo.jpg" alt="Profile Photo" class="about-photo"> -->
+
+        <div class="about-text">
+            <h2>Hello!</h2>
+            <p>
+                My name is Darren Zemanek.
+                I'm a 3D artist, environment designer, and game designer who is passionate about crafting fun, immersive visual experiences.
+                I focus more on creating models and enviornments for my experiences, but have also focused on level design and game development.
+            </p>
+
+            <p>
+                I spent most of my time in college at Texas A&M University in the Visualization major. 
+                I've spent multiple semesters working on multiple types of projects, with artstyles ranging from realistic to stylized.
+                In this portfolio I have some handpicked examples of my work and my progress with the tools and skills over time.
+            </p>
+
+            <h3>Skills</h3>
+            <ul>
+                <li>3D Modeling (Blender, Maya)</li>
+                <li>Texturing (Substance Painter, Photoshop)</li>
+                <li>In-Engine development (Unreal 5, Unity, Godot)</li>
+                <li>Environment design and Layout</li>
+                <li>Game and Level Design</li>
+            </ul>
+
+            <p>
+                If you would like to contact me for questions or comments about me or my work, you can reach me through email or linkedin.
+                <p style="text-align:center;">Email: zemanekdv@tamu.edu  |  <a href="https://zemanekdv.itch.io/passage">LinkedIn - Darren Zemanek</a></p>
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        © 2025 Darren Zemanek
+    </footer>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        document.body.classList.add("fade-in");
+
+        setTimeout(() => {
+            document.body.classList.add("fade-in-loaded");
+            document.body.classList.remove("fade-in");
+        }, 20);
+
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute("href");
+
+            if (!href || href.startsWith('#') || href.startsWith("javascript:")) return;
+
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                document.body.classList.add("fade-out");
+
+                setTimeout(() => {
+                    window.location = href;
+                }, 500);
+            });
+        });
+    });
+    </script>
+
+</body>
+</html>

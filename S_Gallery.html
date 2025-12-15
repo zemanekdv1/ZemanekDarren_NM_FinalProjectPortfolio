@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            transition: opacity 0.4s ease;
+        }
+
+        body.fade-out { opacity: 0; }
+
+        header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background: #444;
+            padding: 10px 0;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .menu > li { position: relative; }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: inline-block;
+            font-size: 18px;
+        }
+        .menu a:hover { background: #555; }
+
+        .dropdown-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            background: #444;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 150px;
+            display: none;
+            border: 1px solid #555;
+            z-index: 2000;
+        }
+        .dropdown:hover .dropdown-menu { display: block; }
+
+        .dropdown-menu li a { display: block; padding: 10px; }
+        .dropdown-menu li a:hover { background: #555; }
+
+        .gallery-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+
+        .gallery-item img, .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-intro {
+            max-width: 1100px;
+            margin: 40px auto 20px auto;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .gallery-intro h2 {
+            margin-bottom: 15px;
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .gallery-intro p {
+            font-size: 18px;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .gallery-intro-flex {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 40px auto 20px auto;
+            gap: 20px;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .intro-text {
+            flex: 1 1 50%;
+            color: #ccc;
+        }
+
+        .intro-text h2 {
+            margin-bottom: 15px;
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .intro-text p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .intro-media {
+            flex: 1 1 40%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .intro-media img, .intro-media video {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            z-index: 1000;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            animation: scaleIn 0.4s ease;
+        }
+
+        .modal-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 50px;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+            padding: 10px;
+            transition: 0.2s;
+            z-index: 2001;
+        }
+
+        .modal-arrow.left { left: 30px; }
+        .modal-arrow.right { right: 30px; }
+
+        .modal-arrow:hover {
+            color: #ddd;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .modal-content img, .modal-content video {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .modal-description {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .close-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .close-btn:hover { background: #555; }
+
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+        @keyframes scaleIn { from {transform: scale(0.9);} to {transform: scale(1);} }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+        }
+
+        body {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        body.fade-out {
+            opacity: 0;
+            transform: translateX(-40px);
+        }
+
+        body.fade-in {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+        body.fade-in-loaded {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Spark</h1>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <ul class="menu">
+            <li><a href="Homepage.html">Home</a></li>
+
+            <li class="dropdown">
+                <a href="#">Projects ▾</a>
+                <ul class="dropdown-menu">
+                    <li><a href="Dungeon.html">Dungeon Bosses</a></li>
+                    <li><a href="SI_Gallery.html">Steampunk Insect</a></li>
+                    <li><a href="PT_Gallery.html">PT - Group Project</a></li>
+                    <li><a href="PT2_Gallery.html">PT - Personal Scene</a></li>
+                    <li><a href="CT_Gallery.html">Cryptid Taxi</a></li>
+                    <li><a href="S_Gallery.html">Spark</a></li>
+                </ul>
+            </li>
+            <li><a href="index.html">Model Viewer</a></li>
+            <li><a href="about.html">About/Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Intro -->
+    <section class="gallery-intro-flex">
+        <div class="intro-text">
+            <h2>Production Tech</h2>
+            <p>Production Techniques was a summer class I took to learn and understand the basics of 3D modeling, texture creation, and environmental design. The project I am showing consists of a team project between me and four of my peers over the course of six weeks, known simply as Passage. Below is a trailer for the project, a link to the Itch.io page for download, and a gallery to view the meshes and environment I helped work on.</p>
+            <p style="text-align:center;"><img src="my-Gallery\images\S_Images\_Spod7.png" alt="Spark_Icon"></p>
+            <p style="text-align:center;"><a href="https://official-itchio.itch.io/spark">Spark - Itch.io</a></p> 
+            <p style="text-align:center;"><video width="500" height="500 " src="my-Gallery\videos\S_Videos\Spark Game Trailer 1.mp4" controls></video></p>
+        </div>
+    </section>
+
+    <!-- Gallery -->
+    <div class="gallery-container">
+        <div class="gallery-grid">
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\ACUnit_01.png" data-desc="AC Unit Front - PSX Style.">
+                <img src="my-Gallery\images\S_Images\ACUnit_01.png" alt="AC_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\ACUnit_02.png" data-desc="AC Unit Back - PSX Style.">
+                <img src="my-Gallery\images\S_Images\ACUnit_02.png" alt="AC_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Bench_01.png" data-desc="Bench Front - PSX Stlye.">
+                <img src="my-Gallery\images\S_Images\Bench_01.png" alt="Bench_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Bench_02.png" data-desc="Bench Back - PSX Stlye.">
+                <img src="my-Gallery\images\S_Images\Bench_02.png" alt="Bench_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Building_01.png" data-desc="Building 1 - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Building_01.png" alt="Build_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Building_02.png" data-desc="Building 2 - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Building_02.png" alt="Build_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Crate_01.png" data-desc="Crate Front - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Crate_01.png" alt="Crate_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Crate_02.png" data-desc="Crate Back - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Crate_02.png" alt="Crate_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Dumpster_01.png" data-desc="Dumpster Front - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Dumpster_01.png" alt="Dump_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Dumpster_02.png" data-desc="Dumpster Back - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Dumpster_02.png" alt="Dump_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Hotdog_01.png" data-desc="Hotdog Front - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Hotdog_01.png" alt="Hot_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Hotdog_02.png" data-desc="Hotdog Back - PSX Style.">
+                <img src="my-Gallery\images\S_Images\Hotdog_02.png" alt="Hot_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\FoodCart.png" data-desc="Foodcart - PSX Style.">
+                <img src="my-Gallery\images\S_Images\FoodCart.png" alt="Cart">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\SubwayCars_01.png" data-desc="Subway Car Top/Side - PSX Style.">
+                <img src="my-Gallery\images\S_Images\SubwayCars_01.png" alt="Sub_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\SubwayCars_02.png" data-desc="Subway Car Bottom/Side - PSX Style.">
+                <img src="my-Gallery\images\S_Images\SubwayCars_02.png" alt="Sub_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_01.png" data-desc="Modular Tileset - 01.">
+                <img src="my-Gallery\images\S_Images\Tileset_01.png" alt="TS_01">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_02.png" data-desc="Modular Tileset - 02.">
+                <img src="my-Gallery\images\S_Images\Tileset_02.png" alt="TS_02">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_03.png" data-desc="Modular Tileset - 03.">
+                <img src="my-Gallery\images\S_Images\Tileset_03.png" alt="TS_03">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_04.png" data-desc="Modular Tileset - 04.">
+                <img src="my-Gallery\images\S_Images\Tileset_04.png" alt="TS_04">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_05.png" data-desc="Modular Tileset - 05.">
+                <img src="my-Gallery\images\S_Images\Tileset_05.png" alt="TS_05">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_06.png" data-desc="Modular Tileset - 06.">
+                <img src="my-Gallery\images\S_Images\Tileset_06.png" alt="TS_06">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_07.png" data-desc="Modular Tileset - 07.">
+                <img src="my-Gallery\images\S_Images\Tileset_07.png" alt="TS_07">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\images\S_Images\Tileset_Lighting.png" data-desc="Modular Tileset - Lighting.">
+                <img src="my-Gallery\images\S_Images\Tileset_Lighting.png" alt="TS_L">
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\videos\S_Videos\HotDog_Turntable.mp4" data-desc="A sample video description." data-type="video">
+                <video src="my-Gallery\videos\S_Videos\HotDog_Turntable.mp4"></video>
+            </div>
+            <div class="gallery-item" data-src="my-Gallery\videos\S_Videos\SubwayCar_Turntable.mp4" data-desc="A sample video description." data-type="video">
+                <video src="my-Gallery\videos\S_Videos\SubwayCar_Turntable.mp4"></video>
+            </div>
+            
+
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-arrow left" id="arrow-left">❮</div>
+
+        <div class="modal-content" id="modal-content">
+            <span id="modal-media"></span>
+            <p class="modal-description" id="modal-description"></p>
+            <button class="close-btn" id="close-btn">Close</button>
+        </div>
+
+        <div class="modal-arrow right" id="arrow-right">❯</div>
+    </div>
+
+    <footer>
+        © 2025 Darren Zemanek
+    </footer>
+
+    <script>
+    const items = document.querySelectorAll(".gallery-item");
+    const modal = document.getElementById("modal");
+    const modalMedia = document.getElementById("modal-media");
+    const modalDesc = document.getElementById("modal-description");
+    const closeBtn = document.getElementById("close-btn");
+    const arrowLeft = document.getElementById("arrow-left");
+    const arrowRight = document.getElementById("arrow-right");
+
+    let currentIndex = 0;
+
+    function openModal(index) {
+        const item = items[index];
+        const src = item.dataset.src;
+        const desc = item.dataset.desc;
+        const type = item.dataset.type;
+
+        modalMedia.innerHTML =
+            type === "video"
+            ? `<video src="${src}" controls autoplay></video>`
+            : `<img src="${src}" alt="">`;
+
+        modalDesc.textContent = desc;
+
+        modal.style.display = "flex";
+    }
+
+    items.forEach((item, i) => {
+        item.addEventListener("click", () => {
+            currentIndex = i;
+
+            document.body.classList.add("fade-out");
+            setTimeout(() => {
+                openModal(currentIndex);
+                document.body.classList.remove("fade-out");
+            }, 400);
+        });
+    });
+
+    closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    modal.addEventListener("click", e => {
+        if (e.target === modal) modal.style.display = "none";
+    });
+
+    arrowLeft.addEventListener("click", e => {
+        e.stopPropagation();
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        openModal(currentIndex);
+    });
+
+    arrowRight.addEventListener("click", e => {
+        e.stopPropagation();
+        currentIndex = (currentIndex + 1) % items.length;
+        openModal(currentIndex);
+    });
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+
+        setTimeout(() => {
+            document.body.classList.add("fade-in-loaded");
+            document.body.classList.remove("fade-in");
+        }, 20);
+
+        document.querySelectorAll('a').forEach(link => {
+            const href = link.getAttribute("href");
+
+            if (!href || href.startsWith('#') || href.startsWith("javascript:")) return;
+
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                document.body.classList.add("fade-out");
+
+                setTimeout(() => {
+                    window.location = href;
+                }, 500);
+            });
+        });
+    });
+    </script>
+</body>
+</html>
